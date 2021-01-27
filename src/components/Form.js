@@ -1,43 +1,57 @@
-import React, { Fragment , useState } from "react";
-import uuid from 'uuid/v4'
+import React, { Fragment, useState } from "react";
+import { v4 as uuid } from 'uuid';
 
-const Form = () => {
-    const [appointment, updateAppointment] = useState({
-        pet:'',
-        owner:'',
-        date:'',
-        time:'',
-        symptoms:''
+const Form = ({ createAppointment }) => {
+  const [appointment, updateAppointment] = useState({
+    pet: "",
+    owner: "",
+    date: "",
+    time: "",
+    symptoms: "",
+  });
 
+  const [error, updateError] = useState(false);
+  const { pet, owner, date, time, symptoms } = appointment;
+
+  const updateState = (e) => {
+    updateAppointment({
+      ...appointment,
+      [e.target.name]: e.target.value,
     });
-
-    const [error, updateError] = useState (false)
-
-    const updateState = e =>{
-        updateAppointment({
-            ...appointment,
-            [e.target.name]: e.target.value
-        })
+  };
+  const submitAppointment = (e) => {
+    e.preventDefault();
+    if (
+      pet.trim() === "" ||
+      owner.trim() === "" ||
+      date.trim() === "" ||
+      time.trim() === "" ||
+      symptoms.trim() === ""
+    ) {
+      updateError(true);
+      return;
     }
-    const submitAppointment = e => {
-        e.preventDefault();
-        if (pet.trim()==='' || owner.trim()==='' || date.trim()==='' || time.trim()==='' || symptoms.trim()===''){
-            updateError(true)
-            return;
-        }
-        updateError(false)
-        appointment.id = uuid();
-        console.log(appointment)
+    updateError(false);
+    appointment.id = uuid();
+    createAppointment(appointment);
+    updateAppointment({
+      pet: "",
+      owner: "",
+      date: "",
+      time: "",
+      symptoms: "",
+    });
+  };
 
-    }
-
-    const {pet, owner, date, time, symptoms} = appointment;
   return (
     <Fragment>
       <h2>Create appointment</h2>
-      {error ? <p className="alert-error">All the fields are mandatory, please fill them out!</p> : null}
-      <form
-      onSubmit={submitAppointment}>
+      {error ? (
+        <p className="alert-error">
+          All the fields are mandatory, please fill them out!
+        </p>
+      ) : null}
+      <form onSubmit={submitAppointment}>
         <label>Pet's name</label>
         <input
           type="text"
@@ -78,20 +92,15 @@ const Form = () => {
 
         <label>Symptoms</label>
         <textarea
-        name="symptoms"
-        className="u-full-width"
-        onChange={updateState}
-        value={symptoms}>
-        
+          name="symptoms"
+          className="u-full-width"
+          onChange={updateState}
+          value={symptoms}
+        ></textarea>
 
-        </textarea>
-
-        <button
-        type="submit"
-        className="u-full-width button-primary">
-            CREATE
+        <button type="submit" className="u-full-width button-primary">
+          CREATE
         </button>
-
       </form>
     </Fragment>
   );
